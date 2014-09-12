@@ -1,8 +1,9 @@
-Update defect State bsed on Custom Field value
+Update defect State based on Custom Field value
 =========================
 
 ## Overview
-CAUTION: Initially run this app in the sandbox/playground workspace designated for testing only since it modifies data to make sure that it does what you expect!
+CAUTION: This app will change your data.
+Initially run this app in the sandbox/playground workspace designated for testing only to make sure that it does what you expect!
 
 In this example a custom field of dropdown type exists on Defects, with the following values:
 
