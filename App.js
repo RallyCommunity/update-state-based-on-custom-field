@@ -98,8 +98,6 @@ Ext.define('CustomApp', {
         var that = this;
         var data = this.grid.store.data.items;
         console.log('this.grid',this.grid.store.data);
-        console.log(this._cBoxValue);
-        //console.log(' _onDataLoaded', data);
         if (this._cBoxValue) {
             console.log('calling _onDataLoaded this._cBoxValue not empty', this._cBoxValue);
             var stateValue = '';

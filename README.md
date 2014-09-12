@@ -35,6 +35,12 @@ Refresh the browser to see changes.
 This few second video captures how the app works:
 http://screencast.com/t/BicZTfpaHZSz
 
+To run the app in your environment modify it to work with your custom field and its values:
+
+ - replace 'c_CustomDropdown' with the name of your custom field,
+ - modify hardcoded values in '_onDataLoaded' in if/else block
+
+
 The app is vailable AS IS. It is NOT supported by Rally.
 ## License
 
