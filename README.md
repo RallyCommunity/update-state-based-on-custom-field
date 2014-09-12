@@ -19,9 +19,13 @@ The grid may further be filterd by specific CustomDropdown value:
 When "Update" button is clicked, the defect State is updated based on selection in the CustomDropdown.
 
 State is changed to "Submitted" if CustomDropdown="one"
+
 State is changed to "Open" if CustomDropdown="two"
+
 State is changed to "Fixed" if CustomDropdown="three"
+
 State is changed to "Closed" if CustomDropdown="four"
+
 
 Refresh the browser to see changes.
 
