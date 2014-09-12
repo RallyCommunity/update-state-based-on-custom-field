@@ -1,0 +1,153 @@
+Ext.define('CustomApp', {
+    extend: 'Rally.app.App',
+    componentCls: 'app',
+    items: [
+        {
+            xtype: 'container',
+            itemId: 'filterContainer'
+        },
+        {
+            xtype: 'container',
+            itemId: 'gridContainer',
+            width: 800
+        }
+    ],
+    launch: function() {
+        this.down('#filterContainer').add({
+            xtype: 'rallyattributecombobox',
+            itemId: 'cBox',
+            cls: 'filter',
+            model: 'Defect',
+            field: 'c_CustomDropdown',
+            fieldLabel: 'CustomDropdown',
+            listeners: {
+                ready: this._onComboBoxLoad,
+                select: this._onComboBoxSelect,
+                scope: this
+            }
+        });
+    },
+    _onComboBoxLoad: function(comboBox) {
+        this.comboBox = comboBox;
+
+        Rally.data.ModelFactory.getModel({
+            type: 'Defect',
+            success: this._onModelRetrieved,
+            scope: this
+        });
+    },
+    
+    _onModelRetrieved: function(model) {
+        var that = this;
+        this.grid = this.down('#gridContainer').add({
+            xtype: 'rallygrid',
+            model: model,
+            itemId: 'defectsGrid',
+            enableEditing: false,
+            showRowActionsColumn: false,
+            columnCfgs: [
+                'FormattedID',
+                'Name',
+                'State',
+                'c_CustomDropdown'               
+            ],
+            storeConfig: {
+                context: this.context.getDataContext(),
+                filters: this._getFilter()
+            },
+            listerners:{
+                load: this._onDataLoaded,
+                scope: this
+            }
+        });
+            
+        
+    },
+     _getFilter: function() {
+        this._cBoxValue = this.down('#cBox').getValue();
+        var startDate = new Date(new Date() - 86400000*30).toISOString(); //in the last 30 days; millisecondsInDay = 86400000
+        var filter = [
+            {
+                property : 'LastUpdateDate',
+                operator : '>=',
+                value : startDate
+            }	
+        ];
+
+        if (this._cBoxValue) {
+            filter.push({
+                property: 'c_CustomDropdown',                                 
+                value:this._cBoxValue
+            });
+            this._onDataLoaded();
+        }
+        else{
+            filter.push({
+                property: 'c_CustomDropdown',
+                operator: "!=",
+                value: ''
+            });
+        }
+        return filter;
+    },
+    _onComboBoxSelect: function() {
+            this.grid.filter(this._getFilter(), true, true);
+    },
+
+    _onDataLoaded:function(){
+        var that = this;
+        var data = this.grid.store.data.items;
+        console.log('this.grid',this.grid.store.data);
+        console.log(this._cBoxValue);
+        //console.log(' _onDataLoaded', data);
+        if (this._cBoxValue) {
+            console.log('calling _onDataLoaded this._cBoxValue not empty', this._cBoxValue);
+            var stateValue = '';
+            if (this._cBoxValue === "one") {
+                stateValue = "Submitted";
+            }
+            else if(this._cBoxValue === "two") {
+                stateValue = "Open";
+            }
+            else if(this._cBoxValue === "three") {
+                stateValue = "Fixed";
+            }
+            else{
+                stateValue = "Closed";
+            }
+        }
+        console.log('state value', stateValue);
+        if (!this.down('#updateBtn')) {
+             this.down('#filterContainer').add({
+                    xtype  : 'rallybutton',
+                    text   : 'Update',
+                    itemId: 'updateBtn',
+                    handler: function() {
+                        that._update(data,stateValue); 
+                    }
+                });
+        }
+    },
+    
+    _update:function(data,stateValue){
+        var that = this;
+        var recordsToUpdate = [];
+        _.each(data, function(record){
+            if (record.get('c_CustomDropdown') === that._cBoxValue) {
+                recordsToUpdate.push(record);
+            }
+        });
+        console.log('recordsToUpdate',recordsToUpdate);
+        Rally.data.BulkRecordUpdater.updateRecords({
+                records: recordsToUpdate,
+                propertiesToUpdate: {
+                    State: stateValue
+                },
+                success: function(readOnlyRecords){
+                },
+                scope: this
+            });
+    }
+    
+    
+});
